@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login — Watchily</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{ --bg:#071029; --muted:rgba(234,246,255,0.72); --glass: rgba(255,255,255,0.03); --accent1:#00d4ff; --accent2:#7c5cff; --radius:12px }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:radial-gradient(800px 400px at 10% 20%, rgba(124,92,255,0.06), transparent 8%), radial-gradient(600px 300px at 90% 80%, rgba(0,212,255,0.04), transparent 10%), var(--bg);color:#eaf6ff}
+    .container{max-width:980px;margin:40px auto;padding:18px}
+    header{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#041028;box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    h1{margin:0;font-size:18px}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:20px;border-radius:16px;display:grid;grid-template-columns:1fr 380px;gap:18px;box-shadow:0 12px 40px rgba(2,6,23,0.6)}
+    .left{padding:18px}
+    .right{padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border-radius:12px}
+
+    label{display:block;font-size:13px;color:var(--muted);margin-top:12px}
+    input{width:100%;padding:10px;border-radius:10px;border:none;background:var(--glass);color:inherit;margin-top:6px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041028;font-weight:700;cursor:pointer}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:10px;border-radius:10px;cursor:pointer}
+    .muted{color:var(--muted);font-size:13px}
+
+    .google-btn{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:linear-gradient(90deg,#fff0,#fff0);cursor:pointer}
+    .google-icon{width:20px;height:20px}
+
+    .foot-links{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+
+    @media(max-width:900px){ .card{grid-template-columns:1fr} .right{order:-1} }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo">W</div>
+        <div>
+          <h1>Watchily</h1>
+          <div style="font-size:12px;color:var(--muted)">Buy, sell & collect luxury watches</div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="card" aria-labelledby="login-title">
+        <div class="left">
+          <h2 id="login-title">Welcome back</h2>
+          <p class="muted">Sign in to continue to Watchily. New here? <a href="home.html" style="color:var(--accent1);text-decoration:none">Explore</a></p>
+
+          <form id="loginForm" onsubmit="event.preventDefault(); signIn();">
+            <label for="email">Email</label>
+            <input id="email" type="email" placeholder="you@example.com" required />
+
+            <label for="password">Password</label>
+            <input id="password" type="password" placeholder="Enter your password" required />
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px">
+              <label style="display:flex;align-items:center;gap:8px"><input id="remember" type="checkbox" /> Remember me</label>
+              <button type="button" class="ghost" onclick="forgotPassword()">Forgot password?</button>
+            </div>
+
+            <div style="margin-top:14px"><button class="btn" type="submit">Sign in</button></div>
+          </form>
+
+          <div style="margin-top:18px" class="muted">Or sign in with</div>
+          <div style="margin-top:10px;display:flex;gap:10px">
+            <button class="google-btn" onclick="handleGoogleSignIn()" aria-label="Sign in with Google">
+              <svg class="google-icon" viewBox="0 0 533.5 544.3" xmlns="http://www.w3.org/2000/svg" focusable="false" aria-hidden="true"><path fill="#4285F4" d="M533.5 278.4c0-17.4-1.4-34.1-4-50.4H272v95.5h147.5c-6.4 34.9-25.6 64.5-54.9 84.4v69h88.6c51.8-47.7 81.3-118 81.3-198.5z"/><path fill="#34A853" d="M272 544.3c73.6 0 135.4-24.5 180.5-66.6l-88.6-69c-24.6 16.6-56.1 26.6-91.9 26.6-70.7 0-130.6-47.7-152-111.7h-90v69.9C76.2 476.7 168.6 544.3 272 544.3z"/><path fill="#FBBC05" d="M120 327.6c-10.9-32.6-10.9-67.9 0-100.5v-69.9h-90c-37.4 74.8-37.4 162.1 0 236.9l90-66.5z"/><path fill="#EA4335" d="M272 107.7c39.8 0 75.6 13.7 103.8 40.5l77.8-77.8C405 24.9 343.2 0 272 0 168.6 0 76.2 67.6 30 168.2l90 69.9C141.4 155.4 201.3 107.7 272 107.7z"/></svg>
+              <span style="font-weight:700;color:var(--muted)">Sign in with Google</span>
+            </button>
+
+            <button class="ghost" onclick="window.location='home.html'">Continue as guest</button>
+          </div>
+
+        </div>
+
+        <aside class="right" aria-label="Create account">
+          <h3 style="margin-top:0">Create an account</h3>
+          <p class="muted">Register to list watches, manage your orders and access seller tools.</p>
+          <div style="margin-top:12px">
+            <label for="r_name">Full name</label>
+            <input id="r_name" placeholder="Your name" />
+            <label for="r_email">Email</label>
+            <input id="r_email" type="email" placeholder="you@example.com" />
+            <label for="r_password">Password</label>
+            <input id="r_password" type="password" placeholder="Choose a password" />
+            <div style="margin-top:12px"><button class="btn" onclick="register()">Create account</button></div>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Basic client-side auth simulation — replace with real backend or OAuth flow in production
+    function signIn(){
+      const email = document.getElementById('email').value.trim();
+      const pass = document.getElementById('password').value;
+      if(!email || !pass) return alert('Please enter email and password');
+      // simple validation demo: accept any non-empty values
+      const user = {email, authenticated: true, method: 'local', when: new Date().toISOString()};
+      localStorage.setItem('watchily_user', JSON.stringify(user));
+      alert('Signed in as ' + email);
+      window.location = 'home.html';
+    }
+
+    function register(){
+      const name = document.getElementById('r_name').value.trim();
+      const email = document.getElementById('r_email').value.trim();
+      const pass = document.getElementById('r_password').value;
+      if(!name || !email || !pass) return alert('Please fill all registration fields');
+      // In real app, send to server. Here we just simulate and auto-login.
+      const user = {name, email, authenticated:true, method:'local', when:new Date().toISOString()};
+      localStorage.setItem('watchily_user', JSON.stringify(user));
+      alert('Account created — signed in as ' + email);
+      window.location = 'home.html';
+    }
+
+    function forgotPassword(){
+      const email = prompt('Enter your email to receive a password reset link');
+      if(!email) return;
+      // Simulate sending reset link — in production call backend to send email
+      console.log('Simulated password reset for', email);
+      alert('If that email is registered, a password reset link has been sent.');
+    }
+
+    // Google Sign-In placeholder. To enable real Google sign-in:
+    // 1. Create OAuth client in Google Cloud Console and obtain a client ID.
+    // 2. Replace CLIENT_ID below and implement redirect URI handling on the server or use Google Identity Services.
+    const GOOGLE_OAUTH_CLIENT_ID = ''; // <- add your client id here
+    function handleGoogleSignIn(){
+      if(!GOOGLE_OAUTH_CLIENT_ID){
+        alert('Google Sign-In is not configured. To enable it, add your Google OAuth client ID to the page.');
+        return;
+      }
+      // Example OAuth2 URL (using Google's OAuth 2.0 endpoint). Adjust scopes and redirect_uri as needed.
+      const redirectUri = window.location.origin + '/oauth2callback.html';
+      const scope = encodeURIComponent('profile email');
+      const url = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=' + encodeURIComponent(GOOGLE_OAUTH_CLIENT_ID)
+        + '&response_type=token&scope=' + scope + '&redirect_uri=' + encodeURIComponent(redirectUri);
+      // open popup for auth
+      window.open(url, 'google_signin', 'width=500,height=600');
+    }
+  </script>
+</body>
+</html>

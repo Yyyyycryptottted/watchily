@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Watchily — Addresses</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#071029;--card:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));--accent1:#00d4ff;--accent2:#7c5cff;--muted:rgba(255,255,255,0.72);--glass:rgba(255,255,255,0.03)}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,Arial;background:radial-gradient(800px 400px at 10% 20%, rgba(124,92,255,0.06), transparent 8%),var(--bg);color:#eaf6ff;padding:26px}
+    .app{max-width:1000px;margin:0 auto}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#041028}
+    h1{margin:0;font-size:18px}
+    .panel{background:var(--card);padding:14px;border-radius:12px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-top:12px}
+    .addr{padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.02)}
+    .muted{color:var(--muted);font-size:13px}
+    label{display:block;margin-top:8px;font-size:13px}
+    input,select,textarea{width:100%;padding:10px;border-radius:8px;border:none;background:var(--glass);color:inherit}
+    .row{display:flex;gap:8px}
+    .btn{padding:10px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041028;font-weight:700;cursor:pointer}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px;border-radius:10px;cursor:pointer}
+    @media(max-width:860px){.row{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="logo">W</div>
+        <div>
+          <h1>Watchily — Addresses</h1>
+          <div class="muted">Save delivery addresses and attach to orders</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <a class="ghost" href="home.html">Back Home</a>
+        <button id="seedBtn" class="ghost">Seed Demo</button>
+      </div>
+    </header>
+
+    <main>
+      <section class="panel">
+        <h3 style="margin:0">Add / Edit Address</h3>
+        <div style="height:8px"></div>
+        <input type="hidden" id="a_id" />
+        <div class="row">
+          <div style="flex:1">
+            <label>Full name <input id="a_name" /></label>
+          </div>
+          <div style="width:180px">
+            <label>Phone <input id="a_phone" /></label>
+          </div>
+        </div>
+        <label>Address line 1 <input id="a_line1" /></label>
+        <label>Address line 2 <input id="a_line2" /></label>
+        <div class="row">
+          <div style="flex:1"><label>City <input id="a_city" /></label></div>
+          <div style="width:160px"><label>State <input id="a_state" /></label></div>
+          <div style="width:140px"><label>Postal code <input id="a_postal" /></label></div>
+        </div>
+        <label>Country <input id="a_country" value="India" /></label>
+        <div style="height:8px"></div>
+        <div style="display:flex;gap:8px">
+          <button id="saveAddr" class="btn">Save Address</button>
+          <button id="clearAddr" class="ghost">Clear</button>
+        </div>
+      </section>
+
+      <section style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3 style="margin:0">Your Addresses</h3>
+          <div style="display:flex;gap:8px;align-items:center">
+            <select id="orderSelect" style="min-width:220px"></select>
+            <button id="attachBtn" class="btn">Attach to Order</button>
+          </div>
+        </div>
+
+        <div id="addrGrid" class="grid"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const ADDR_KEY = 'watchily_addresses';
+    const ORD_KEY = 'watchily_orders_v1';
+
+    function uid(pref='a'){return pref+Math.random().toString(36).slice(2,9)}
+    function load(key){try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]}}
+    function save(key,val){localStorage.setItem(key, JSON.stringify(val))}
+
+    // Seed demo address
+    document.getElementById('seedBtn').addEventListener('click', ()=>{ if(confirm('Seed one demo address?')){ const demo=[{id:'a1',name:'Aman Singh',phone:'+91 98765 43210',line1:'Flat 12B, Lotus Apartments',line2:'MG Road',city:'Mumbai',state:'Maharashtra',postal:'400001',country:'India',isDefault:true}]; save(ADDR_KEY,demo); renderAll(); alert('Demo address added'); }});
+
+    // Save address
+    document.getElementById('saveAddr').addEventListener('click', ()=>{
+      const id = document.getElementById('a_id').value || uid();
+      const addr = {
+        id,
+        name: document.getElementById('a_name').value.trim(),
+        phone: document.getElementById('a_phone').value.trim(),
+        line1: document.getElementById('a_line1').value.trim(),
+        line2: document.getElementById('a_line2').value.trim(),
+        city: document.getElementById('a_city').value.trim(),
+        state: document.getElementById('a_state').value.trim(),
+        postal: document.getElementById('a_postal').value.trim(),
+        country: document.getElementById('a_country').value.trim(),
+        isDefault: false
+      };
+      if(!addr.name || !addr.line1 || !addr.city) return alert('Please enter name, address line 1 and city');
+      let list = load(ADDR_KEY);
+      // if editing, replace
+      const existing = list.find(x=>x.id===id);
+      if(existing){ list = list.map(x=> x.id===id ? Object.assign({}, x, addr) : x ); }
+      else { list.unshift(addr); }
+      save(ADDR_KEY, list);
+      clearForm(); renderAll();
+    });
+
+    function clearForm(){ document.getElementById('a_id').value=''; ['a_name','a_phone','a_line1','a_line2','a_city','a_state','a_postal','a_country'].forEach(id=>document.getElementById(id).value=''); }
+    document.getElementById('clearAddr').addEventListener('click', ()=>clearForm());
+
+    function renderAll(){ renderGrid(); renderOrderSelect(); }
+
+    function renderGrid(){ const grid = document.getElementById('addrGrid'); grid.innerHTML=''; const list = load(ADDR_KEY);
+      if(list.length===0) { grid.innerHTML = '<div class="panel muted">No addresses yet — add one above.</div>'; return; }
+      list.forEach(a=>{
+        const el = document.createElement('div'); el.className='addr';
+        el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:start"><div><strong>${a.name}${a.isDefault? ' · Default':''}</strong><div class="muted">${a.phone||''}</div></div><div style="display:flex;flex-direction:column;gap:6px"><button class='ghost' data-id='${a.id}' data-action='edit'>Edit</button><button class='ghost' data-id='${a.id}' data-action='del'>Delete</button><button class='ghost' data-id='${a.id}' data-action='default'>Set Default</button></div></div><div style="margin-top:8px;color:var(--muted)">${a.line1}${a.line2? ', '+a.line2: ''}<br>${a.city}, ${a.state} ${a.postal}<br>${a.country}</div>`;
+        grid.appendChild(el);
+      });
+    }
+
+    document.getElementById('addrGrid').addEventListener('click', e=>{
+      const btn = e.target.closest('button'); if(!btn) return; const id = btn.dataset.id; const action = btn.dataset.action;
+      if(action==='edit'){ const list = load(ADDR_KEY); const a = list.find(x=>x.id===id); if(!a) return; document.getElementById('a_id').value=a.id; document.getElementById('a_name').value=a.name; document.getElementById('a_phone').value=a.phone; document.getElementById('a_line1').value=a.line1; document.getElementById('a_line2').value=a.line2; document.getElementById('a_city').value=a.city; document.getElementById('a_state').value=a.state; document.getElementById('a_postal').value=a.postal; document.getElementById('a_country').value=a.country; }
+      if(action==='del'){ if(!confirm('Delete address?')) return; let list = load(ADDR_KEY); list = list.filter(x=>x.id!==id); save(ADDR_KEY,list); renderAll(); }
+      if(action==='default'){ let list = load(ADDR_KEY); list = list.map(x=> Object.assign({}, x, {isDefault: x.id===id})); save(ADDR_KEY,list); renderAll(); }
+    });
+
+    // Attach to order
+    function renderOrderSelect(){ const sel = document.getElementById('orderSelect'); sel.innerHTML=''; const orders = load(ORD_KEY); if(!orders || orders.length===0){ sel.innerHTML = '<option value="">No orders available</option>'; return; } orders.forEach(o=>{ const opt = document.createElement('option'); opt.value = o.id; opt.textContent = `${o.id} — ${o.items.length} items · ${o.total}`; sel.appendChild(opt); }); }
+
+    document.getElementById('attachBtn').addEventListener('click', ()=>{
+      const sel = document.getElementById('orderSelect'); const orderId = sel.value; if(!orderId) return alert('Select an order first'); const list = load(ADDR_KEY); if(list.length===0) return alert('No addresses to attach — add one first');
+      // use default address if present, otherwise prompt user to pick
+      let addr = list.find(x=>x.isDefault) || list[0];
+      // confirm which to attach
+      const confirmMsg = `Attach address for ${addr.name}\n\n${addr.line1}${addr.line2? '\n'+addr.line2: ''}\n${addr.city}, ${addr.state} ${addr.postal}\n${addr.country}\n\nAttach to order ${orderId}?`;
+      if(!confirm(confirmMsg)) return;
+      const orders = load(ORD_KEY);
+      const oidx = orders.findIndex(x=>x.id===orderId);
+      if(oidx===-1) return alert('Order not found');
+      orders[oidx].shippingAddress = addr;
+      save(ORD_KEY, orders);
+      alert('Address attached to order '+orderId);
+      renderOrderSelect();
+    });
+
+    // initialize: seed a sample address if none (non-destructive)
+    if(load(ADDR_KEY).length===0){ const s=[{id:'a1',name:'Aman Singh',phone:'+91 98765 43210',line1:'Flat 12B, Lotus Apartments',line2:'MG Road',city:'Mumbai',state:'Maharashtra',postal:'400001',country:'India',isDefault:true}]; save(ADDR_KEY,s); }
+    renderAll();
+  </script>
+</body>
+</html>

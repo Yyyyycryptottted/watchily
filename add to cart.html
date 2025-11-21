@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Watchily — Add To Cart & Checkout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{ --bg:#071029; --card: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); --accent1:#00d4ff; --accent2:#7c5cff; --muted:rgba(255,255,255,0.72); --glass:rgba(255,255,255,0.03); --radius:12px }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0}
+    body{font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;background:radial-gradient(800px 400px at 10% 20%, rgba(124,92,255,0.06), transparent 8%),radial-gradient(600px 300px at 90% 80%, rgba(0,212,255,0.04), transparent 10%),var(--bg);color:#eaf6ff;padding:26px}
+    .app{max-width:1100px;margin:0 auto}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#041028}
+    .nav{display:flex;gap:10px;align-items:center}
+    .nav a{color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:10px}
+
+    .layout{display:grid;grid-template-columns:1fr 420px;gap:18px}
+    .panel{background:var(--card);padding:16px;border-radius:12px}
+    h2{margin:0 0 8px 0}
+    .product-list{display:grid;gap:12px}
+    .product-item{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02))}
+    .thumb{width:84px;height:64px;border-radius:8px;background:linear-gradient(90deg,var(--accent1),var(--accent2));display:flex;align-items:center;justify-content:center;color:#041028;font-weight:800}
+    .pmeta{flex:1}
+    .pmeta .title{font-weight:700}
+    .qty{display:flex;gap:6px;align-items:center}
+    .qty button{padding:6px 8px;border-radius:8px;border:none;background:transparent;color:var(--muted);cursor:pointer}
+
+    .checkout-box{position:sticky;top:22px}
+    .summary-row{display:flex;justify-content:space-between;margin:6px 0;color:var(--muted)}
+    .total{font-weight:800;font-size:18px}
+    input,select,textarea{width:100%;padding:10px;border-radius:8px;border:none;background:var(--glass);color:inherit}
+    .btn{padding:10px 14px;border-radius:12px;border:none;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#041028;font-weight:700;cursor:pointer;width:100%}
+
+    @media(max-width:980px){ .layout{grid-template-columns:1fr} .checkout-box{position:static} }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div class="brand">
+        <div class="logo">W</div>
+        <div>
+          <div style="font-weight:800">Watchily</div>
+          <div style="font-size:12px;color:var(--muted)">Checkout & secure payment</div>
+        </div>
+      </div>
+      <nav class="nav"><a href="home.html">Home</a><a href="#">Buyer</a><a href="#">Seller</a></nav>
+    </header>
+
+    <main class="layout">
+      <div>
+        <div class="panel">
+          <h2>Select Products</h2>
+          <p style="color:var(--muted);margin-top:6px">Choose items to add to the cart. Data comes from local demo storage.</p>
+          <div style="height:12px"></div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <select id="selectProduct" style="flex:1"></select>
+            <input id="selectQty" type="number" value="1" min="1" style="width:96px" />
+            <button class="btn" id="addBtn">Add</button>
+          </div>
+
+          <div style="height:8px"></div>
+          <h3 style="margin:0 0 8px 0">Cart</h3>
+          <div id="cartList" class="product-list"></div>
+        </div>
+
+        <div style="height:12px"></div>
+        <div class="panel">
+          <h3 style="margin-top:0">Order Notes</h3>
+          <textarea id="orderNotes" rows="3" placeholder="Add shipping notes or delivery instructions (optional)"></textarea>
+        </div>
+      </div>
+
+      <aside class="checkout-box">
+        <div class="panel">
+          <h3 style="margin-top:0">Order Summary</h3>
+          <div class="summary-row"><div>Subtotal</div><div id="subtotal">$0</div></div>
+          <div class="summary-row"><div>Shipping</div><div id="shipping">$0</div></div>
+          <div class="summary-row"><div>Tax (8%)</div><div id="tax">$0</div></div>
+          <div class="summary-row total"><div>Total</div><div id="grand">$0</div></div>
+
+          <div style="height:12px"></div>
+          <h3 style="margin-top:0">Payment</h3>
+          <label>Name on card <input id="cardName" placeholder="Full name" /></label>
+          <label style="margin-top:8px">Card number <input id="cardNumber" placeholder="1234 5678 9012 3456" /></label>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="cardExp" placeholder="MM/YY" />
+            <input id="cardCvv" placeholder="CVV" />
+          </div>
+          <div style="height:12px"></div>
+          <button class="btn" id="payBtn">Pay Now</button>
+          <div style="height:8px"></div>
+          <div style="color:var(--muted);font-size:13px">This is a demo payment — no real charges.</div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    // localStorage keys used in main app
+    const KEY_PRODUCTS = 'watchily_products_v1';
+    const KEY_ORDERS = 'watchily_orders_v1';
+    const KEY_CART = 'watchily_cart';
+
+    function load(key){ try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]} }
+    function save(key,val){ localStorage.setItem(key, JSON.stringify(val)); }
+
+    // Fill product select
+    const select = document.getElementById('selectProduct');
+    function populateProducts(){ const products = load(KEY_PRODUCTS); select.innerHTML=''; products.forEach(p=>{ const opt=document.createElement('option'); opt.value=p.id; opt.textContent = p.title + ' — $' + p.price + ' · ' + p.stock + ' in stock'; select.appendChild(opt); }); if(products.length===0){ select.innerHTML='<option>No products</option>'; } }
+
+    // Cart stored as {id:qty}
+    function getCart(){ return JSON.parse(localStorage.getItem(KEY_CART)||'{}'); }
+    function saveCart(cart){ localStorage.setItem(KEY_CART, JSON.stringify(cart)); renderCart(); }
+
+    function addToCartFromSelect(){ const id = select.value; const qty = Math.max(1, Number(document.getElementById('selectQty').value||1)); const products = load(KEY_PRODUCTS); const p = products.find(x=>x.id===id); if(!p) return alert('Product not found'); if(qty > p.stock) return alert('Not enough stock'); const cart = getCart(); cart[id] = (cart[id]||0) + qty; saveCart(cart); alert('Added to cart'); }
+    document.getElementById('addBtn').addEventListener('click', addToCartFromSelect);
+
+    // Render cart
+    function renderCart(){ const container = document.getElementById('cartList'); container.innerHTML=''; const cart = getCart(); const products = load(KEY_PRODUCTS);
+      for(const id in cart){ const p = products.find(x=>x.id===id); if(!p) continue; const qty = cart[id]; const item = document.createElement('div'); item.className='product-item'; item.innerHTML = `
+        <div class="thumb">${p.brand||''}</div>
+        <div class="pmeta">
+          <div class="title">${p.title}</div>
+          <div style="color:var(--muted);font-size:13px">$${p.price} · ${p.stock} in stock</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <div class="qty"><button data-id="${id}" class="dec">-</button><div style="padding:6px 10px;border-radius:8px;background:var(--glass)">${qty}</div><button data-id="${id}" class="inc">+</button></div>
+          <div style="color:var(--muted);font-size:13px">$${(p.price*qty).toFixed(2)}</div>
+          <button data-id="${id}" class="remove ghost" style="margin-top:6px">Remove</button>
+        </div>`;
+        container.appendChild(item);
+      }
+      updateSummary();
+    }
+
+    // Cart controls
+    document.getElementById('cartList').addEventListener('click', e=>{
+      const id = e.target.dataset && e.target.dataset.id;
+      if(!id) return;
+      const cart = getCart(); const products = load(KEY_PRODUCTS); const p = products.find(x=>x.id===id);
+      if(e.target.classList.contains('inc')){ if(cart[id] < (p? p.stock : Infinity)) cart[id]++; saveCart(cart); }
+      if(e.target.classList.contains('dec')){ cart[id] = Math.max(0, (cart[id]||0)-1); if(cart[id]===0) delete cart[id]; saveCart(cart); }
+      if(e.target.classList.contains('remove')){ delete cart[id]; saveCart(cart); }
+    });
+
+    function updateSummary(){ const cart = getCart(); const products = load(KEY_PRODUCTS); let subtotal=0; for(const id in cart){ const p = products.find(x=>x.id===id); if(!p) continue; subtotal += p.price * cart[id]; }
+      const shipping = subtotal>0 ? 25 : 0; const tax = +(subtotal * 0.08).toFixed(2); const grand = +(subtotal + shipping + tax).toFixed(2);
+      document.getElementById('subtotal').textContent = '$' + subtotal.toFixed(2);
+      document.getElementById('shipping').textContent = '$' + shipping.toFixed(2);
+      document.getElementById('tax').textContent = '$' + tax.toFixed(2);
+      document.getElementById('grand').textContent = '$' + grand.toFixed(2);
+    }
+
+    // Payment (mock)
+    document.getElementById('payBtn').addEventListener('click', ()=>{
+      const cart = getCart(); if(Object.keys(cart).length===0) return alert('Cart is empty');
+      const name = document.getElementById('cardName').value.trim(); const card = document.getElementById('cardNumber').value.trim(); const exp = document.getElementById('cardExp').value.trim(); const cvv = document.getElementById('cardCvv').value.trim();
+      if(!name||!card||!exp||!cvv) return alert('Please complete payment details (demo)');
+      if(card.replace(/\s+/g,'').length < 12) return alert('Card number seems invalid (demo)');
+
+      const products = load(KEY_PRODUCTS);
+      let subtotal = 0; const items = [];
+      for(const id in cart){ const p = products.find(x=>x.id===id); if(!p) continue; const qty = cart[id]; if(qty > p.stock) return alert('Not enough stock for '+p.title); items.push({id:p.id,title:p.title,qty,price:p.price}); subtotal += p.price * qty; }
+      const shipping = subtotal>0 ? 25 : 0; const tax = +(subtotal*0.08).toFixed(2); const total = +(subtotal + shipping + tax).toFixed(2);
+      const order = { id: 'o' + Math.random().toString(36).slice(2,9), items, subtotal, shipping, tax, total, notes: document.getElementById('orderNotes').value.trim(), date: new Date().toLocaleString(), payment:{name,cardMask: '****' + card.slice(-4)} };
+
+      // reduce stock
+      items.forEach(it=>{ const p = products.find(x=>x.id===it.id); if(p) p.stock = Math.max(0, p.stock - it.qty); });
+
+      // save
+      const orders = load(KEY_ORDERS); orders.unshift(order); save(KEY_ORDERS, orders); save(KEY_PRODUCTS, products);
+
+      // clear cart
+      localStorage.removeItem(KEY_CART);
+      populateProducts(); renderCart(); alert('Payment successful (demo). Order ID: ' + order.id);
+    });
+
+    // Init
+    populateProducts(); renderCart();
+
+    // If no products exist, seed minimal demo (non-destructive)
+    if(load(KEY_PRODUCTS).length===0){ const demo = [ {id:'p1',title:'Rolex Submariner',brand:'Rolex',price:12500,stock:2,desc:'Classic diver',img:''}, {id:'p2',title:'Omega Speedmaster',brand:'Omega',price:6800,stock:3,desc:'Moonwatch',img:''} ]; save(KEY_PRODUCTS,demo); populateProducts(); }
+  </script>
+</body>
+</html
